@@ -2,14 +2,14 @@ module.exports = {
 	
 	numUsers: async function(conn){
 		//const conn = await mysql.createConnection(config);
-		let a = `SELECT id FROM mybd.users`;
+		let a = `SELECT id FROM heroku_00aeb0b4dc34359.users`;
 		const [rows,fields] = await conn.execute(a);
 		console.log(rows[rows.length-1]['id']);
 		return rows[rows.length-1]['id'];
 	},
 	
 	getInterfaces: async function(conn, id){
-		let c = `SELECT * FROM mybd.users WHERE id=${id}`;
+		let c = `SELECT * FROM heroku_00aeb0b4dc34359.users WHERE id=${id}`;
 		let arr = [];
 		const [rows1,fields1] =  await conn.execute(c);
 		console.log(rows1);
@@ -27,7 +27,7 @@ module.exports = {
 	},
 	
 	Log: async function(conn, time, id, nameInt, CurMes){
-		let d = `Insert into mybd.Log(Moment, IdUser, Interface, Message) values ('${time}', ${id}, '${nameInt}', '${CurMes}')`;
+		let d = `Insert into heroku_00aeb0b4dc34359.log(Moment, IdUser, Interface, Message) values ('${time}', ${id}, '${nameInt}', '${CurMes}')`;
 		await conn.execute(d);
 	}
 };
