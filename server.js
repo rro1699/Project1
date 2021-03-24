@@ -3,14 +3,14 @@ const bodyParesr = require('body-parser');
 const mysql = require('mysql2/promise');
 const config = require('./config'); 
 const bd = require('./database'); 
-const WebSoket =  require('ws'); 
-
+const WebSoket =  require('ws').Server; 
+const http = require("http");
 
 const app = express();
 app.set('view engine','ejs');
 app.use(bodyParesr.urlencoded({extended: true}));
 const PORT = process.env.PORT || 8080;
-
+server = http.createServer(app);
 function getDateTime() {
 
     var date = new Date();
@@ -40,9 +40,10 @@ function getDateTime() {
 async function main(){
 	const conn = await mysql.createConnection(config);
 	
-	const wss = new WebSoket.Server({app});
-	wss.on('connection',(ws:WebSoket)=>{
-		ws.send('Hi, I am WebSoket server');
+	var wss = new WebSocketServer({server: server});
+
+	wss.on("connection", function(ws){
+	   ws.send('Hi there, I am a WebSocket server');
 	});
 	
 	let arr = [];
@@ -79,7 +80,7 @@ async function main(){
 		res.redirect('/');
 	});
 	app.get('/list',(req,res) => res.render('ViewList',{arr:arr}));	
-	app.listen(PORT);
+	server.listen(PORT);
 	console.log('Сервер стартовал!'+PORT);
 }
 
