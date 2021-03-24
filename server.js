@@ -3,11 +3,14 @@ const bodyParesr = require('body-parser');
 const mysql = require('mysql2/promise');
 const config = require('./config'); 
 const bd = require('./database'); 
+const WebSoket =  require('ws'); 
+
 
 const app = express();
 app.set('view engine','ejs');
 app.use(bodyParesr.urlencoded({extended: true}));
 const PORT = process.env.PORT || 8080;
+
 function getDateTime() {
 
     var date = new Date();
@@ -36,6 +39,11 @@ function getDateTime() {
 
 async function main(){
 	const conn = await mysql.createConnection(config);
+	
+	const wss = new WebSoket.Server(app);
+	wss.on('connection',(ws:WebSoket)=>{
+		ws.send('Hi, I am WebSoket server');
+	});
 	
 	let arr = [];
 	let arr2 = [];
