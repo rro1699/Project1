@@ -40,7 +40,7 @@ function getDateTime() {
 async function main(){
 	const conn = await mysql.createConnection(config);
 	
-	const wss = new WebSoket.Server(app);
+	const wss = new WebSoket.Server({app});
 	wss.on('connection',(ws:WebSoket)=>{
 		ws.send('Hi, I am WebSoket server');
 	});
