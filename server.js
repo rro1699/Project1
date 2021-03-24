@@ -3,7 +3,7 @@ const bodyParesr = require('body-parser');
 const mysql = require('mysql2/promise');
 const config = require('./config'); 
 const bd = require('./database'); 
-const WebSocket =  require('ws'); 
+const WebSocket =  require("ws"); 
 const http = require('http');
 
 const app = express();
