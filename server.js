@@ -3,8 +3,8 @@ const bodyParesr = require('body-parser');
 const mysql = require('mysql2/promise');
 const config = require('./config'); 
 const bd = require('./database'); 
-const WebSoket =  require('ws').Server; 
-const http = require("http");
+const WebSocket =  require('ws'); 
+const http = require('http');
 
 const app = express();
 app.set('view engine','ejs');
@@ -40,10 +40,16 @@ function getDateTime() {
 async function main(){
 	const conn = await mysql.createConnection(config);
 	
-	var wss = new WebSoket({server: server});
+	const webSocketServer = new WebSocket.Server({ server });
 
-	wss.on("connection", (ws: WebSocket)=>{
-	   ws.send('Hi there, I am a WebSocket server');
+	webSocketServer.on('connection', ws => {
+   		ws.on('message', m => {
+			webSocketServer.clients.forEach(client => client.send(m));
+   		});
+
+   		ws.on("error", e => ws.send(e));
+
+   		ws.send('Hi there, I am a WebSocket server');
 	});
 	
 	let arr = [];
