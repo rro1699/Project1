@@ -40,9 +40,9 @@ function getDateTime() {
 async function main(){
 	const conn = await mysql.createConnection(config);
 	
-	var wss = new WebSocketServer({server: server});
+	var wss = new WebSoket({server: server});
 
-	wss.on("connection", function(ws){
+	wss.on("connection", (ws: WebSocket)=>{
 	   ws.send('Hi there, I am a WebSocket server');
 	});
 	
