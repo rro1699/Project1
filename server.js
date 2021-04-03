@@ -3,14 +3,14 @@ const bodyParesr = require('body-parser');
 const mysql = require('mysql2/promise');
 const config = require('./config'); 
 const bd = require('./database'); 
-const WebSocket =  require("ws"); 
-const http = require('http');
+const dgram = require('dgram');//npm i dgram
+const client = dgram.createSocket('udp4');
+const client1 = dgram.createSocket('udp4');
 
 const app = express();
 app.set('view engine','ejs');
 app.use(bodyParesr.urlencoded({extended: true}));
 const PORT = process.env.PORT || 8080;
-server = http.createServer(app);
 function getDateTime() {
 
     var date = new Date();
@@ -40,19 +40,20 @@ function getDateTime() {
 async function main(){
 	const conn = await mysql.createConnection(config);
 	
-	const webSocketServer = new WebSocket.Server({ server });
-
-	webSocketServer.on('connection', ws => {
-   		
-   		ws.send('Hi there, I am a WebSocket server');
-	});
-	
 	let arr = [];
 	let arr2 = [];
 	let tmp;
 	let numU = await bd.numUsers(conn);
+	
+	async function getNumUsers(){
+		numU = await bd.numUsers(conn);
+	}
+	
 	//console.log(numU);
-	app.get('/', (req,res) => res.render('HomePage',{b:numU}));
+	app.get('/', (req,res) => {
+		getNumUsers();
+		res.render('HomePage',{b:numU});
+	});
 	app.post('/',(req,res) => {
 		tmp  = req.body.id;
 		 per();
@@ -81,7 +82,68 @@ async function main(){
 		res.redirect('/');
 	});
 	app.get('/list',(req,res) => res.render('ViewList',{arr:arr}));	
-	server.listen(PORT);
+	
+	app.get('/admin', (req,res) =>{
+		res.render('HomeAdmin');
+	});
+	
+	async function ADD(lora, lte,wifi, ip1, ip2){
+		getNumUsers();
+		bd.Add(conn,(numU+1), lora, wifi, lte, ip1, ip2);
+	}
+	
+	app.get('/admin/add', (req,res) =>{
+		getNumUsers();
+		console.log("id:"+numU);
+		res.render('Add');
+	});
+	app.post('/admin/add', (req,res) =>{
+		
+		console.log("id:"+(numU+1) +" ip1:"+ req.body.ip1 +" ip2:"+req.body.ip2+"lora:"+req.body.lora+"lte:"+req.body.lte+"wifi:"+req.body.wifi);
+		var l=0;
+		var w=0;
+		var lo=0;
+		if(req.body.lte == 'yes'){
+			l=1;
+		}
+		if(req.body.lora == 'yes'){
+			w=1;
+		}
+		if(req.body.wifi == 'yes'){
+			lo=1;
+		}
+		
+		ADD(lo, l, w, req.body.ip1, req.body.ip2);
+		/*const man ={
+			ip1: req.body.ip1,
+			ip2: req.body.ip2
+		};
+		client1.send(JSON.stringify(man), 41234, '192.168.0.101', (err) => {
+			client1.close();
+		});*/
+		res.redirect('/admin');
+	});
+	
+	
+	
+	async function Delete(id){
+		bd.Delete(conn, id);
+	}
+	app.get('/admin/delete', (req,res) =>{
+		getNumUsers();
+		res.render('Delete',{b:numU});
+	});
+	
+	app.post('/admin/delete',(req,res) => {
+		tmp1  = req.body.id;
+		Delete(tmp1);
+		res.redirect('/admin');
+	});
+	
+	
+	
+	
+	app.listen(PORT);
 	console.log('Сервер стартовал!'+PORT);
 }
 
