@@ -29,5 +29,34 @@ module.exports = {
 	Log: async function(conn, time, id, nameInt, CurMes){
 		let d = `Insert into heroku_00aeb0b4dc34359.log(Moment, IdUser, Interface, Message) values ('${time}', ${id}, '${nameInt}', '${CurMes}')`;
 		await conn.execute(d);
+	},
+	
+	Add: async function(conn, id, Lora, Wifi, LTE, ip1, ip2){
+		let d = `Insert into heroku_00aeb0b4dc34359.Users(Id, LTE, LoRa, WiFi) values (${id}, ${LTE}, ${Lora}, ${Wifi})`;
+		console.log("id:"+id +" ip1:"+ ip1 +" ip2:"+ip2+" lora:"+Lora+" lte:"+LTE+" wifi:"+Wifi);
+		await conn.execute(d);
+		if(Lora ==1){
+			let c = `Insert into heroku_00aeb0b4dc34359.lora(IdUser, Adress, vheshadress) values ('${id}', '${ip1}', '${ip2}')`;
+			await conn.execute(c);
+		}
+		if(Wifi ==1){
+			let c = `Insert into heroku_00aeb0b4dc34359.wifi(IdUser, Adress, vheshadress) values ('${id}', '${ip1}', '${ip2}')`;
+			await conn.execute(c);
+		}
+		if(LTE ==1){
+			let c = `Insert into heroku_00aeb0b4dc34359.lte(IdUser, Adress, vheshadress) values ('${id}', '${ip1}', '${ip2}')`;
+			await conn.execute(c);
+		}
+	},
+	
+	Delete: async function(conn, id){
+		let d = `Delete FROM heroku_00aeb0b4dc34359.lte where IdUser= ${id}`;
+		await conn.execute(d);
+		let c = `Delete FROM heroku_00aeb0b4dc34359.wifi where IdUser= ${id}`;
+		await conn.execute(c);
+		let e = `Delete FROM heroku_00aeb0b4dc34359.lora where IdUser= ${id}`;
+		await conn.execute(e);
+		let k = `Delete FROM heroku_00aeb0b4dc34359.users where Id= ${id}`;
+		await conn.execute(k);
 	}
 };
